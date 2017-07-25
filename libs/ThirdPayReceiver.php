@@ -47,6 +47,7 @@ trait TThirdPayReceiver
 			$payload['code'],
 			$payload['tradeId'],
 			$payload['time'],
+			$payload['amount'],
 			$payload['payerId'],
 			$payload['extensions'],
 		]);
@@ -64,11 +65,12 @@ trait TThirdPayReceiver
 	 * @param  string $code
 	 * @param  string $thirdTradeId
 	 * @param  int $time
+	 * @param  int $amount
 	 * @param  int $payerId
 	 * @param  array $extensions
 	 *
 	 * @return CallbackResult
 	 */
-	abstract protected function asyncCallback( string$code, string$thirdTradeId, int$time, int$payerId=null, array$extensions=[] ):CallbackResult;
+	abstract protected function asyncCallback( string$code, string$thirdTradeId, int$time, int$amount, int$payerId=null, array$extensions=[] ):CallbackResult;
 
 }
