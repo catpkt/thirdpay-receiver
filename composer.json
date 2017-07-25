@@ -1,0 +1,22 @@
+{
+    "name": "catpkt/thirdpay-receiver",
+    "description": "Required by user applications of catpkt/thirdpay-provider",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fenz",
+            "email": "uukoo@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "catpkt/simple-http-server-lib": "^0.0.1",
+        "fenzland/http": "^0.1.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "CatPKT\\ThirdPayReceiver\\": "libs/"
+        }
+    }
+}
