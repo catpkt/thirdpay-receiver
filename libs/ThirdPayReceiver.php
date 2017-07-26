@@ -4,6 +4,7 @@ namespace CatPKT\ThirdPayReceiver;
 
 use CatPKT\Encryptor\Encryptor;
 use CatPKT\HttpServer\TServer;
+use FenzHTTP\HTTP;
 use Symfony\Component\HttpFoundation\{  Request,  Response  };
 
 ////////////////////////////////////////////////////////////////
@@ -11,6 +12,47 @@ use Symfony\Component\HttpFoundation\{  Request,  Response  };
 trait TThirdPayReceiver
 {
 	use TServer;
+
+	/**
+	 * Method createPay
+	 *
+	 * @access public
+	 *
+	 * @param  string $code
+	 * @param  int $amount
+	 * @param  string $comment
+	 * @param  string $thirdId
+	 * @param  array $extensions
+	 *
+	 * @return array
+	 */
+	public function createPay( string$code, int$amount, string$comment, string$thirdId=null, array$extensions=[] ):array
+	{
+		$encryptor= $this->getEncryptor();
+
+		$response= HTTP::url( $this->getApiUri() )->post(
+			$encryptor->encrypt( [
+				'code'=> $code,
+				'amount'=> $amount,
+				'comment'=> $comment,
+				'thirdId'=> $thirdId,
+				'extensions'=> $extensions,
+			] )
+		);
+
+		return $encryptor->decrypt( $response->body );
+	}
+
+	/**
+	 * Method getApiUri
+	 *
+	 * @abstract
+	 *
+	 * @access protected
+	 *
+	 * @return string
+	 */
+	abstract protected function getApiUri():string;
 
 	/**
 	 * Method getRoutes
