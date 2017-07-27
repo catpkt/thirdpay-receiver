@@ -4,7 +4,7 @@ namespace CatPKT\ThirdPayReceiver;
 
 use CatPKT\Encryptor\Encryptor;
 use CatPKT\HttpServer\TServer;
-use FenzHTTP\HTTP;
+use FenzHTTP\{  HTTP,  Response as ClientResponse  };
 use Symfony\Component\HttpFoundation\{  Request,  Response  };
 
 ////////////////////////////////////////////////////////////////
@@ -40,6 +40,8 @@ trait TThirdPayReceiver
 			] )
 		);
 
+		$this->checkPayCreatingResponse( $response );
+
 		return $encryptor->decrypt( $response->body );
 	}
 
@@ -53,6 +55,29 @@ trait TThirdPayReceiver
 	 * @return string
 	 */
 	abstract protected function getApiUri():string;
+
+	/**
+	 * Method checkPayCreatingResponse
+	 *
+	 * @access private
+	 *
+	 * @param  ClientResponse $response
+	 *
+	 * @return viod
+	 */
+	private function checkPayCreatingResponse( ClientResponse$response )
+	{
+		if( $response->status>=200 && $response->status<300 )
+		{
+			return;
+		}
+		if( $response->status>=400 && $response->status<500 )
+		{
+			throw new CreatePayException( 400, $this->getEncryptor()->decrypt( $response->body ) );
+		}else{
+			throw new CreatePayException( 507 );
+		}
+	}
 
 	/**
 	 * Method getRoutes
