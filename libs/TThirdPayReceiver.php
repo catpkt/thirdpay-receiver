@@ -2,7 +2,7 @@
 
 namespace CatPKT\ThirdPayReceiver;
 
-use CatPKT\Encryptor\Encryptor;
+use CatPKT\Encryptor\{  Encryptor,  DecryptException  };
 use CatPKT\HttpServer\TServer;
 use FenzHTTP\{  HTTP,  Response as ClientResponse  };
 use Symfony\Component\HttpFoundation\{  Request,  Response  };
@@ -71,9 +71,21 @@ trait TThirdPayReceiver
 		{
 			return;
 		}
+		if( $response->status==418 )
+		{
+			throw new CreatePayException( 418 );
+		}
 		if( $response->status>=400 && $response->status<500 )
 		{
-			throw new CreatePayException( 400, $this->getEncryptor()->decrypt( $response->body ) );
+			try{
+				$exception= $this->getEncryptor()->decrypt( $response->body );
+			}
+			catch( DecryptException$e )
+			{
+				$exception= $response->body;
+			}
+
+			throw new CreatePayException( 400, $exception );
 		}else{
 			throw new CreatePayException( 507 );
 		}
@@ -110,7 +122,7 @@ trait TThirdPayReceiver
 
 		$payload= $encryptor->decrypt( $request->getContent() );
 
-		$result= $request->asyncCallback(...[
+		$result= $this->asyncCallback(...[
 			$payload['code'],
 			$payload['tradeId'],
 			$payload['time'],
@@ -119,7 +131,7 @@ trait TThirdPayReceiver
 			$payload['extensions'],
 		]);
 
-		return new Response( $encryptor->encryptor( $result->getPayload() ), $result->getStatus() );
+		return new Response( $encryptor->encrypt( $result->getPayload() ), $result->getStatus() );
 	}
 
 	/**
