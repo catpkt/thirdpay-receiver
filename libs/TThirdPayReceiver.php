@@ -86,8 +86,12 @@ trait TThirdPayReceiver
 			}
 
 			throw new CreatePayException( 400, $exception );
+		}
+		if( $response->status===507 )
+		{
+			throw new CreatePayException( 507, $this->getEncryptor()->decrypt( $response->body ) );
 		}else{
-			throw new CreatePayException( 507 );
+			throw new CreatePayException( 502 );
 		}
 	}
 
